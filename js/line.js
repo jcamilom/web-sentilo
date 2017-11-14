@@ -20,6 +20,12 @@ var line = d3.line()
     .x(function(d) { return x(d.timestamp); })
     .y(function(d) { return y(d.value); });
 
+/* Initialize tooltip */
+tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return 'Temp: ' + d.value; });
+
+/* Invoke the tip in the context of the visualization */
+svg.call(tip);
+
 d3.request(url)
     .header('IDENTITY_KEY', token)
     .response(function(xhr) {
@@ -34,7 +40,8 @@ d3.request(url)
 function processData(data) {
 
     x.domain(d3.extent(data.observations, function(d) { return d.timestamp; }));
-    y.domain(d3.extent(data.observations, function(d) { return d.value; }));
+    //y.domain(d3.extent(data.observations, function(d) { return d.value; }));
+    y.domain([0, 35]);
 
     // Add the X Axis
     g.append("g")
@@ -72,12 +79,15 @@ function processData(data) {
         .attr("d", line);
 
     // Add the scatterplot
-    g.selectAll("dot")
+    g.selectAll(".dot")
         .data(data.observations)
       .enter().append("circle")
-        .attr("r", 3.5)
+        .attr("class", "dot")
+        .attr("r", 5)
         .attr("cx", function(d) { return x(d.timestamp); })
-        .attr("cy", function(d) { return y(d.value); });
+        .attr("cy", function(d) { return y(d.value); })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
 }
 
 function loadDoc() {
