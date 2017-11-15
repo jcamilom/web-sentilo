@@ -1,6 +1,8 @@
 var url = 'http://localhost:4000/data/provider1/sensor1?limit=30&from=14/11/2017T00:00:00';
 var token = '5a4a0c470418d5b97c71d266c35097ef678e09caab63d135978085b90ef251bf';
 
+var yPadding = 0.2  // vertical "padding" for the y axe
+
 var svg = d3.select("svg"),
     margin = {top: 20, right: 20, bottom: 90, left: 80},
     width = +svg.attr("width") - margin.left - margin.right,
@@ -29,19 +31,22 @@ svg.call(tip);
 d3.request(url)
     .header('IDENTITY_KEY', token)
     .response(function(xhr) {
-        return JSON.parse(xhr.responseText, (key, value) => 
-            key == 'timestamp'
-                ? timeParse(value)  // return the parsed date
-                : value             // return everything else unchanged
-        );
+        return JSON.parse(xhr.responseText, (key, value) => {
+            if(key == 'timestamp') return timeParse(value);     // return the parsed date
+            else if(key == 'value' && !isNaN(Number(value))) return Number(value);  // return value type Number
+            else return value;  // return value unchanged
+        });
     })
     .get(processData);
 
 function processData(data) {
 
     x.domain(d3.extent(data.observations, function(d) { return d.timestamp; }));
-    //y.domain(d3.extent(data.observations, function(d) { return d.value; }));
-    y.domain([0, 35]);
+    var yDomainArr = (d3.extent(data.observations, function(d) { return d.value; }));
+    var yDomainVal = yDomainArr[1] - yDomainArr[0];
+    yDomainArr[0] = yDomainArr[0] - (yDomainVal * yPadding);
+    yDomainArr[1] = yDomainArr[1] + (yDomainVal * yPadding);
+    y.domain(yDomainArr);
 
     // Add the X Axis
     g.append("g")
