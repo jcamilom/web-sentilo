@@ -1,16 +1,23 @@
-var url = 'http://localhost:4000/data/provider1/sensor1?limit=30&from=14/11/2017T00:00:00';
+var host = 'http://sistemic.udea.edu.co',
+    port = '4000',
+    path = '/data/provider1/sensor1',
+    request = '?limit=150&from=';
+
+var url = host + ':' + port + path + request;
 var token = '5a4a0c470418d5b97c71d266c35097ef678e09caab63d135978085b90ef251bf';
 
 var yPadding = 0.2  // vertical "padding" for the y axe
+
+// Date Parser and Formater
+var utcParse = d3.utcParse("%d/%m/%YT%H:%M:%S");   // example 10/11/2017T21:52:08
+var utcFormat = d3.utcFormat("%d/%m/%YT%H:%M:%S");
+var utcFormatPrint = d3.utcFormat("%H:%M");
 
 var svg = d3.select("svg"),
     margin = {top: 20, right: 20, bottom: 90, left: 80},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-var timeParse = d3.timeParse("%d/%m/%YT%H:%M:%S");   // example 10/11/2017T21:52:08
-// the value is being incremented by +5h. I suppose it is because UTC-5
 
 var x = d3.scaleTime()
     .rangeRound([0, width]);
@@ -23,21 +30,31 @@ var line = d3.line()
     .y(function(d) { return y(d.value); });
 
 /* Initialize tooltip */
-tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return 'Temp: ' + d.value; });
+tip = d3.tip().attr('class', 'd3-tip').html(function(d) {
+    return 'Temp: ' + d.value + "°C<br/> Time: " + utcFormatPrint(d.timestamp); 
+});
 
 /* Invoke the tip in the context of the visualization */
 svg.call(tip);
 
-d3.request(url)
-    .header('IDENTITY_KEY', token)
-    .response(function(xhr) {
-        return JSON.parse(xhr.responseText, (key, value) => {
-            if(key == 'timestamp') return timeParse(value);     // return the parsed date
-            else if(key == 'value' && !isNaN(Number(value))) return Number(value);  // return value type Number
-            else return value;  // return value unchanged
-        });
-    })
-    .get(processData);
+timeIntSelected();
+
+
+
+// ======================================== FUNCTIONS SECTION ======================================== //
+
+function requestData(urlRequest) {
+    d3.request(urlRequest)
+        .header('IDENTITY_KEY', token)
+        .response(function(xhr) {
+            return JSON.parse(xhr.responseText, (key, value) => {
+                if(key == 'timestamp') return utcParse(value);     // return the parsed date
+                else if(key == 'value' && !isNaN(Number(value))) return Number(value);  // return value type Number
+                else return value;  // return value unchanged
+            });
+        })
+        .get(processData);
+}
 
 function processData(data) {
 
@@ -46,7 +63,7 @@ function processData(data) {
     var yDomainVal = yDomainArr[1] - yDomainArr[0];
     yDomainArr[0] = yDomainArr[0] - (yDomainVal * yPadding);
     yDomainArr[1] = yDomainArr[1] + (yDomainVal * yPadding);
-    y.domain(yDomainArr);
+    y.domain(yDomainArr);   
 
     // Add the X Axis
     g.append("g")
@@ -55,7 +72,7 @@ function processData(data) {
         .call(d3.axisBottom(x)
             //.tickSize(6,0)
             //.ticks(3)
-            .tickFormat(d3.timeFormat('%b %d - %H:%M')))
+            .tickFormat(d3.utcFormat('%b %d - %H:%M')))
         .selectAll("text")	
             .style("text-anchor", "end")
             .attr("dx", "-.8em")
@@ -95,15 +112,29 @@ function processData(data) {
         .on('mouseout', tip.hide);
 }
 
-function loadDoc() {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("demo").innerHTML = this.responseText;
-        }
-    };
-    xhttp.open("GET", "http://localhost:4000/data/provider1/sensor1?limit=30&from=10/11/2017T00:00:00", true);
-    // Huge security risk
-    xhttp.setRequestHeader('IDENTITY_KEY', '5a4a0c470418d5b97c71d266c35097ef678e09caab63d135978085b90ef251bf');
-    xhttp.send();
+function timeIntSelected(radioSelected = true) {
+    var today = new Date();      // current date
+    var dateRequest;
+
+    // First time
+    if(radioSelected === true) {
+        radioSelected = {value: 'lastday'};
+    }
+
+    // Update the request
+    switch(radioSelected.value) {
+        case 'today':
+            dateRequest = utcFormat(today.setHours(0,0,0));            
+            break;
+        case 'lastday':
+            dateRequest = utcFormat(today.setHours(today.getHours() - 24));
+            break;
+        case 'custom':
+            alert("under construction");
+            break;
+        default:
+            alert("radio button error");
+            break;
+    }
+    requestData(url + dateRequest);
 }

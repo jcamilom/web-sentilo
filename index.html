@@ -8,9 +8,23 @@
 </head>
 
 <body>
-    <svg id="main-svg" width="960" height="600"></svg>
-    <!-- <button type="button" onclick="loadDoc()">Request data</button> -->
-    <p id="demo"></p>
+    <div id="page">
+        <div id="maincontent">
+            <div id="headercontent"></div>
+            <div id="bodycontent">
+                <svg id="main-svg" width="960" height="600"></svg>
+            </div>
+        </div>
+        <div id="menurightcontent">            
+            <form onchange="timeIntSelected()">
+                <input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="today"> Hoy<br>
+                <input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="lastday" checked> Últimas 24h<br>
+                <input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="custom" disabled> Personalizado
+            </form>
+        </div>
+        <div id="clearingdiv"></div>
+    </div>
+
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="js/d3-tip.js"></script>
     <script src="js/line.js"></script>

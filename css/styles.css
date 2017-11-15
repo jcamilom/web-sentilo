@@ -20,3 +20,24 @@ circle:hover {
     fill: #bbb;
     stroke: #444;
 }
+
+#page {
+    /* margin-left: 200px; */
+}
+
+#maincontent {
+    float: left;
+    width: 80%;
+    background-color: #F0F0F0;
+}
+
+#menurightcontent{
+    float: right;
+    width: 20%;
+    /* margin-right: 0px; */
+    background-color: #CCCCCC;
+}
+
+#clearingdiv {
+    clear: both;
+}
