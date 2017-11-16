@@ -9,18 +9,6 @@
     font-size: 12px;
 }
 
-circle {
-    fill: #000;
-    fill-opacity: 0.7;
-    stroke: #bbb;
-    stroke-width: 1px;
-}
-
-circle:hover {
-    fill: #bbb;
-    stroke: #444;
-}
-
 #page {
     /* margin-left: 200px; */
 }

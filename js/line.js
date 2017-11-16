@@ -99,58 +99,7 @@ function processData(responseData) {
             .on('end', function() { d3.select(this).attr("d", line); })
         .transition()
             .duration(duration / 2)
-            .style('opacity', 1)
-
-    // ==================== Scatterplot ==================== //
-    // DATA JOIN
-    // Join new data with old elements, if any.
-    var update = g.selectAll(".dot")
-        .data(data.observations, function(d) { return d.timestamp; });
-
-    // ENTER
-    // Create new elements as needed.
-    var enter = update.enter()
-        .append("circle")
-        .attr("class", "dot")
-        .attr("r", 5)
-        .attr("cx", function(d) { return x(d.timestamp); })
-        .attr("cy", function(d) { return y(d.value); })
-        .style('opacity', 0)
-        .on('mouseover', tip.show)
-        .on('mouseout', tip.hide);
-
-    // EXIT
-    // Elements to be removed.
-    var exit = update.exit();
-
-    // UPDATE
-    // Update old elements as needed.
-    update.transition()
-        .duration(duration)
-        //.style('fill', 'black')
-        .attr("cx", function(d) { return x(d.timestamp); })
-        .attr("cy", function(d) { return y(d.value); });
-    
-    // Transition for the new elements
-    enter.transition()
-        .duration(duration)
-        //.style('fill', 'green')
-        .style('opacity', 1);
-
-    // Remove old elements as needed.
-    exit.transition()
-        //.duration(duration/2)
-        //.style('fill', 'red')        
-      //.transition()
-        .duration(duration)
-        .style('opacity', 0)
-        .remove();
-    
-    // ENTER + UPDATE
-    // After merging the entered elements with the update selection,
-    // apply operations to both.
-/*     update.merge(enter)
-        .text(function(d) { return d; }); */
+            .style('opacity', 1);
 
     // ==================== Axes ==================== //
     // Update the X Axis
