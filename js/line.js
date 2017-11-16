@@ -8,19 +8,19 @@ var token = '5a4a0c470418d5b97c71d266c35097ef678e09caab63d135978085b90ef251bf';
 
 var yPadding = 0.2  // vertical "padding" for the y axe
 
-// Transition's duration
-duration = 1000;
-
-// Flag to initialize the graph
-var init = false;
-
-// Variable that holds the data
-var data;
+// Variables
+duration = 1000;        // Transition's duration
+var init = false;       // Flag to initialize the graph
+var data;               // Variable that holds the data
+var focus;              // For the mouseover
 
 // Date Parser and Formater
 var utcParse = d3.utcParse("%d/%m/%YT%H:%M:%S");   // example 10/11/2017T21:52:08
 var utcFormat = d3.utcFormat("%d/%m/%YT%H:%M:%S");
 var utcFormatPrint = d3.utcFormat("%H:%M");
+
+// Date Bisector
+var bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
 
 var svg = d3.select("svg"),
     margin = {top: 20, right: 20, bottom: 90, left: 80},
@@ -74,6 +74,11 @@ function requestData(urlRequest) {
 function processData(responseData) {
 
     data = responseData;
+
+    // Sort the data by date
+    data.observations.sort(function(a, b) {
+        return a.timestamp - b.timestamp;
+    });
 
     // Scale the range of the data
     x.domain(d3.extent(data.observations, function(d) { return d.timestamp; }));
@@ -176,10 +181,36 @@ function initGraph(){
     g.append("path")
         .datum(data.observations)
         .attr('class', 'line')
-        .attr("fill", "none")
-        .attr("stroke", "steelblue")
-        .attr("stroke-linejoin", "round")
-        .attr("stroke-linecap", "round")
-        .attr("stroke-width", 1.5)
         .attr("d", line);
+
+    // Add the focus container
+    focus = g.append("g")
+        .attr("class", "focus")
+        .style("display", "none");
+  
+    focus.append("circle")
+        .attr("r", 5);
+  
+    focus.append("text")
+        .attr("x", 9)
+        .attr("dy", ".35em");
+
+    g.append("rect")
+        .attr("class", "overlay")
+        .attr("width", width)
+        .attr("height", height)
+        .on("mouseover", function() { focus.style("display", null); })
+        .on("mouseout", function() { focus.style("display", "none"); })
+        .on("mousemove", mousemove);
 }
+
+function mousemove() {
+    console.log(x.invert(d3.mouse(this)[0]));
+    var x0 = x.invert(d3.mouse(this)[0]),
+        i = bisectDate(data.observations, x0, 1),
+        d0 = data.observations[i - 1],
+        d1 = data.observations[i],
+        d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
+    focus.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.value) + ")");
+    focus.select("text").text(d.value);
+  }

@@ -29,3 +29,20 @@
 #clearingdiv {
     clear: both;
 }
+
+.line {
+    stroke: #2f5491;
+    stroke-width: 3px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    fill: none;
+  }
+
+.overlay {
+    fill: none;
+    pointer-events: all;
+}
+  
+.focus circle {
+    fill: #e08600;
+  }
