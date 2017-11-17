@@ -1,7 +1,7 @@
 var host = 'http://sistemic.udea.edu.co',
     port = '4000',
     path = '/data/provider1/sensor1',
-    request = '?limit=150&from=';
+    request = '?limit=2000&from=';
 
 var url = host + ':' + port + path + request;
 var token = '5a4a0c470418d5b97c71d266c35097ef678e09caab63d135978085b90ef251bf';
@@ -9,15 +9,20 @@ var token = '5a4a0c470418d5b97c71d266c35097ef678e09caab63d135978085b90ef251bf';
 var yPadding = 0.2  // vertical "padding" for the y axe
 
 // Variables
-duration = 1000;        // Transition's duration
+var duration = 1000;        // Transition's duration
 var init = false;       // Flag to initialize the graph
 var data;               // Variable that holds the data
 var focus;              // For the mouseover
 
+// Document Nodes
+var dateInputs = document.querySelectorAll("input[type='date']");
+var submitButton = document.getElementById('submitDate');
+
 // Date Parser and Formater
 var utcParse = d3.utcParse("%d/%m/%YT%H:%M:%S");   // example 10/11/2017T21:52:08
 var utcFormat = d3.utcFormat("%d/%m/%YT%H:%M:%S");
-var utcFormatPrint = d3.utcFormat("%H:%M");
+var utcFormatPrintHour = d3.utcFormat("%H:%M");
+var utcFormatPrintDay = d3.utcFormat('%b %d - %H:%M');
 
 // Date Bisector
 var bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
@@ -42,15 +47,15 @@ var line = d3.line()
 var xAxis = d3.axisBottom(x)
     //.tickSize(6,0)
     .ticks(3)
-    .tickFormat(d3.utcFormat('%b %d - %H:%M'))
+    .tickFormat(utcFormatPrintDay);
 
 /* Initialize tooltip */
-tip = d3.tip().attr('class', 'd3-tip').html(function(d) {
-    return 'Temp: ' + d.value + "°C<br/> Time: " + utcFormatPrint(d.timestamp); 
-});
+/* tip = d3.tip().attr('class', 'd3-tip').html(function(d) {
+    return 'Temp: ' + d.value + "°C<br/> Time: " + utcFormatPrintHour(d.timestamp); 
+}); */
 
 /* Invoke the tip in the context of the visualization */
-svg.call(tip);
+/* svg.call(tip); */
 
 timeIntSelected();
 
@@ -88,8 +93,8 @@ function processData(responseData) {
     yDomainArr[1] = yDomainArr[1] + (yDomainVal * yPadding);
     y.domain(yDomainArr);
     
-    // Create axes if don't exist
-    if(!init)  {
+    // Init the graph
+    if(!init) {
         initGraph();
         init = true;
     }
@@ -131,25 +136,38 @@ function timeIntSelected(radioSelected = true) {
 
     // First time
     if(radioSelected === true) {
+        // Check one of the radio buttons (default)
+        document.getElementById("tilastday").checked = true;
         radioSelected = {value: 'lastday'};
     }
 
     // Update the request
     switch(radioSelected.value) {
         case 'today':
-            dateRequest = utcFormat(today.setHours(0,0,0));            
+            dateRequest = utcFormat(today.setHours(0,0,0));             
             break;
         case 'lastday':
             dateRequest = utcFormat(today.setHours(today.getHours() - 24));
             break;
-        case 'custom':
-            alert("under construction");
+        case 'custom':            
             break;
         default:
             alert("radio button error");
             break;
     }
-    requestData(url + dateRequest);
+    if(radioSelected.value != 'custom') {
+        // Disable the datepickers and submit button
+        for(var i = 0; i < dateInputs.length; i++) dateInputs[i].disabled = true;
+        submitButton.disabled = true;
+        // Request the data
+        requestData(url + dateRequest);
+    } else {
+        // Enalbe the datepickers and submit button submitDate
+        for(var i = 0; i < dateInputs.length; i++) dateInputs[i].disabled = false;
+        submitButton.disabled = false;
+        dateInputs[0].focus();
+    }
+    //requestData('data/' + radioSelected.value + '.json');
 }
 
 function initGraph(){
@@ -179,9 +197,9 @@ function initGraph(){
 
     // Add the valueline path.
     g.append("path")
-        .datum(data.observations)
-        .attr('class', 'line')
-        .attr("d", line);
+        //.datum(data.observations)
+        .attr('class', 'line');
+        //.attr("d", line);
 
     // Add the focus container
     focus = g.append("g")
@@ -205,12 +223,22 @@ function initGraph(){
 }
 
 function mousemove() {
-    console.log(x.invert(d3.mouse(this)[0]));
     var x0 = x.invert(d3.mouse(this)[0]),
         i = bisectDate(data.observations, x0, 1),
         d0 = data.observations[i - 1],
         d1 = data.observations[i],
         d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
     focus.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.value) + ")");
-    focus.select("text").text(d.value);
+    focus.select("text").text(d.value + ' -> ' + utcFormatPrintDay(x0));
   }
+
+function validateDateForm() {
+    var fromDate = dateInputs[0].valueAsDate;
+    var toDate = dateInputs[1].valueAsDate;
+    if(fromDate > toDate) {
+        alert("Selección inválida. Intente de nuevo");
+    } else {
+        requestData(url + utcFormat(fromDate) + '&to=' + utcFormat(toDate));
+    }    
+    return false;
+}

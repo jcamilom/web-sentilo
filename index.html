@@ -17,16 +17,34 @@
         </div>
         <div id="menurightcontent">            
             <form>
-                <label><input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="today"> Hoy<br></label>
-                <label><input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="lastday" checked> Últimas 24h<br></label>
-                <label><input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="custom" disabled> Personalizado</label>
+                <div>
+                    <input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="today" id="titoday">
+                        <label for="titoday">Hoy<br></label>
+                    <input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="lastday" id="tilastday">
+                        <label for="tilastday">Últimas 24h<br></label>
+                    <input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="custom" id="ticustom">
+                        <label for="ticustom">Personalizado:</label>
+                </div>
+            </form>
+            <form onsubmit="return validateDateForm()">
+                <div id="dateDiv" class="divCustom">
+                    <label for="fromdate">Desde: </label>
+                        <input type="date" id="fromdate" name="fromDate" required disabled>
+                        <span class="validity"></span>
+                    <label for="todate"><br>Hasta: </label>
+                        <input type="date" id="todate" name="toDate" required disabled>
+                        <span class="validity"></span>
+                </div>
+                <div id="submitDiv" class="divCustom">
+                    <input id="submitDate" type="submit" disabled>
+                </div>
             </form>
         </div>
         <div id="clearingdiv"></div>
     </div>
 
     <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="js/d3-tip.js"></script>
+    <!-- <script src="js/d3-tip.js"></script> -->
     <script src="js/line.js"></script>
 </body>
 </html>

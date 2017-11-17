@@ -46,3 +46,17 @@
 .focus circle {
     fill: #e08600;
   }
+
+.divCustom {
+    margin: 5px 5px 10px 15px;    
+}
+
+input:invalid+span:after {
+    content: '✖';
+    padding-left: 5px;
+}
+
+input:valid+span:after {
+    content: '✓';
+    padding-left: 5px;
+}
