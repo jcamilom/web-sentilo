@@ -10,12 +10,13 @@ var yPadding = 0.2  // vertical "padding" for the y axe
 
 // Variables
 var duration = 1000;        // Transition's duration
-var init = false;       // Flag to initialize the graph
-var data;               // Variable that holds the data
-var focus;              // For the mouseover
+var init = false;           // Flag to initialize the graph
+var data;                   // Variable that holds the data
+var focus;                  // For the mouseover
 
 // Document Nodes
 var dateInputs = document.querySelectorAll("input[type='date']");
+var timeInputs = document.querySelectorAll("input[type='time']");
 var submitButton = document.getElementById('submitDate');
 
 // Date Parser and Formater
@@ -157,18 +158,20 @@ function timeIntSelected(radioSelected = true) {
     }
 
     if(radioSelected.value != 'custom') {
-        // Disable the datepickers and submit button
+        // Disable the datepickers, time-selectors and submit button
         for(var i = 0; i < dateInputs.length; i++) dateInputs[i].disabled = true;
+        for(var i = 0; i < timeInputs.length; i++) timeInputs[i].disabled = true;
         submitButton.disabled = true;
         // Request the data
         requestData(url + dateRequest);
     } else {
-        // Enalbe the datepickers and submit button submitDate
+        // Enalbe the datepickers, time-selectors and submit button submitDate
         for(var i = 0; i < dateInputs.length; i++) dateInputs[i].disabled = false;
+        for(var i = 0; i < timeInputs.length; i++) timeInputs[i].disabled = false;
         submitButton.disabled = false;
         dateInputs[0].focus();
     }
-    requestData('data/' + radioSelected.value + '.json');
+    //requestData('data/' + radioSelected.value + '.json');
 }
 
 function initGraph(){
@@ -234,12 +237,20 @@ function mousemove() {
   }
 
 function validateDateForm() {
+    var today = new Date();
     var fromDate = dateInputs[0].valueAsDate;
     var toDate = dateInputs[1].valueAsDate;
-    if(fromDate > toDate) {
+    var fromTime = timeInputs[0].valueAsDate;
+    var toTime = timeInputs[1].valueAsDate;
+    // Add time to from-date
+    fromDate.setUTCHours(fromDate.getUTCHours() + fromTime.getUTCHours(), 
+        fromDate.getUTCMinutes() + fromTime.getUTCMinutes());
+    // Add time to to-date
+    toDate.setUTCHours(toDate.getUTCHours() + toTime.getUTCHours(), 
+        toDate.getUTCMinutes() + toTime.getUTCMinutes());
+    if(fromDate > toDate || toDate >= today) {
         alert("Selección inválida. Intente de nuevo");
     } else {
         requestData(url + utcFormat(fromDate) + '&to=' + utcFormat(toDate));
-    }    
-    return false;
+    }
 }
