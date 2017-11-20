@@ -4,7 +4,7 @@ var host = 'http://sistemic.udea.edu.co',
     request = '?limit=2000&from=';
 
 var url = host + ':' + port + path + request;
-var token = '5a4a0c470418d5b97c71d266c35097ef678e09caab63d135978085b90ef251bf';
+var token = '0a70cb90153806082421599d21d653858de8f3b25da2dc9a1fe1e4e8f36d7373';
 
 var yPadding = 0.2  // vertical "padding" for the y axe
 
@@ -155,6 +155,7 @@ function timeIntSelected(radioSelected = true) {
             alert("radio button error");
             break;
     }
+
     if(radioSelected.value != 'custom') {
         // Disable the datepickers and submit button
         for(var i = 0; i < dateInputs.length; i++) dateInputs[i].disabled = true;
@@ -167,7 +168,7 @@ function timeIntSelected(radioSelected = true) {
         submitButton.disabled = false;
         dateInputs[0].focus();
     }
-    //requestData('data/' + radioSelected.value + '.json');
+    requestData('data/' + radioSelected.value + '.json');
 }
 
 function initGraph(){
