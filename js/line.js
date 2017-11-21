@@ -30,7 +30,7 @@ var formatPrintDay = d3.timeFormat('%b %d - %H:%M');
 var bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
 
 var svg = d3.select("svg"),
-    margin = {top: 20, right: 20, bottom: 90, left: 80},
+    margin = {top: 20, right: 60, bottom: 20, left: 80},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -214,16 +214,24 @@ function initGraph(){
     focus.append("circle")
         .attr("r", 5);
     
+    focus.append("rect")
+        .attr("class", "tooltip")
+        .attr("width", 120)
+        .attr("height", 50)
+        .attr("x", -60)
+        .attr("y", -57)
+        .attr("rx", 10)
+        .attr("ry", 10);
+    
     // place the value at the intersection
     focus.append("text")
-        .attr("class", "y1")
-        //.attr("x", 9)
-        .attr("dx", 8)
-        .attr("dy", "-.3em");
+        .attr("class", "textTooltip")
+        .attr("id", "textValue")
+        .attr("y", -37);
     focus.append("text")
-        .attr("class", "y2")
-        .attr("dx", 8)
-        .attr("dy", "1em");
+        .attr("class", "textTooltip")
+        .attr("id", "textDate")
+        .attr("y", -18);
 
     // append the rectangle to capture mouse
     g.append("rect")
@@ -242,8 +250,8 @@ function mousemove() {
         d1 = data.observations[i],
         d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
     focus.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.value) + ")");
-    focus.select("text.y1").text(d.value);
-    focus.select("text.y2").text(formatPrintDay(x0));
+    focus.select("#textValue").text(d.value + "°C");
+    focus.select("#textDate").text(formatPrintDay(x0));
   }
 
 function validateDateForm() {
