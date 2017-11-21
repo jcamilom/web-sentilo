@@ -10,6 +10,7 @@ var yPadding = 0.2  // vertical "padding" for the y axe
 
 // Variables
 var duration = 1000;        // Transition's duration
+var durationShort = 750;    // Shorter transition's duration
 var init = false;           // Flag to initialize the graph
 var data;                   // Variable that holds the data
 var focus;                  // For the mouseover
@@ -109,7 +110,7 @@ function processData(responseData) {
         .datum(data.observations)
         .transition()
             .duration(duration / 2)
-            .style('opacity', 0)          
+            .style('opacity', 0)
             .on('end', function() { d3.select(this).attr("d", line); })
         .transition()
             .duration(duration / 2)
@@ -240,8 +241,13 @@ function initGraph(){
         .attr("class", "overlay")
         .attr("width", width)
         .attr("height", height)
-        .on("mouseover", function() { focus.style("display", null); })
-        .on("mouseout", function() { focus.style("display", "none"); })
+        .style('opacity', 0)
+        .on("mouseover", function() { focus.style("display", null).transition().duration(durationShort).style('opacity', 1); })
+        .on("mouseout", function() { 
+            focus.transition()
+                .duration(durationShort)
+                .style('opacity', 0)
+                .on('end', function() { d3.select(this).style("display", "none"); }) ;})
         .on("mousemove", mousemove);
 }
 
