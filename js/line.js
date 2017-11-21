@@ -24,6 +24,7 @@ var utcParse = d3.utcParse("%d/%m/%YT%H:%M:%S");   // example 10/11/2017T21:52:0
 var utcFormat = d3.utcFormat("%d/%m/%YT%H:%M:%S");
 var utcFormatPrintHour = d3.utcFormat("%H:%M");
 var utcFormatPrintDay = d3.utcFormat('%b %d - %H:%M');
+var formatPrintDay = d3.timeFormat('%b %d - %H:%M');
 
 // Date Bisector
 var bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
@@ -48,7 +49,7 @@ var line = d3.line()
 var xAxis = d3.axisBottom(x)
     //.tickSize(6,0)
     .ticks(3)
-    .tickFormat(utcFormatPrintDay);
+    .tickFormat(formatPrintDay);
 
 /* Initialize tooltip */
 /* tip = d3.tip().attr('class', 'd3-tip').html(function(d) {
@@ -212,11 +213,19 @@ function initGraph(){
   
     focus.append("circle")
         .attr("r", 5);
-  
+    
+    // place the value at the intersection
     focus.append("text")
-        .attr("x", 9)
-        .attr("dy", ".35em");
+        .attr("class", "y1")
+        //.attr("x", 9)
+        .attr("dx", 8)
+        .attr("dy", "-.3em");
+    focus.append("text")
+        .attr("class", "y2")
+        .attr("dx", 8)
+        .attr("dy", "1em");
 
+    // append the rectangle to capture mouse
     g.append("rect")
         .attr("class", "overlay")
         .attr("width", width)
@@ -233,7 +242,8 @@ function mousemove() {
         d1 = data.observations[i],
         d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
     focus.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.value) + ")");
-    focus.select("text").text(d.value + ' -> ' + utcFormatPrintDay(x0));
+    focus.select("text.y1").text(d.value);
+    focus.select("text.y2").text(formatPrintDay(x0));
   }
 
 function validateDateForm() {
