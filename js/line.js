@@ -25,6 +25,7 @@ var utcFormat = d3.utcFormat("%d/%m/%YT%H:%M:%S");
 var utcFormatPrintHour = d3.utcFormat("%H:%M");
 var utcFormatPrintDay = d3.utcFormat('%b %d - %H:%M');
 var formatPrintDay = d3.timeFormat('%b %d - %H:%M');
+var currentTimeZoneOffsetInHours = (new Date()).getTimezoneOffset() / 60;
 
 // Date Bisector
 var bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
@@ -42,6 +43,7 @@ var y = d3.scaleLinear()
     .rangeRound([height, 0]);
 
 var line = d3.line()
+    .curve(d3.curveBasis)
     .x(function(d) { return x(d.timestamp); })
     .y(function(d) { return y(d.value); });
 
@@ -146,7 +148,7 @@ function timeIntSelected(radioSelected = true) {
     // Update the request
     switch(radioSelected.value) {
         case 'today':
-            dateRequest = utcFormat(today.setHours(0,0,0));             
+            dateRequest = utcFormat(today.setHours(0,0,0));            
             break;
         case 'lastday':
             dateRequest = utcFormat(today.setHours(today.getHours() - 24));
@@ -261,10 +263,10 @@ function validateDateForm() {
     var fromTime = timeInputs[0].valueAsDate;
     var toTime = timeInputs[1].valueAsDate;
     // Add time to from-date
-    fromDate.setUTCHours(fromDate.getUTCHours() + fromTime.getUTCHours(), 
+    fromDate.setUTCHours(fromTime.getUTCHours() + currentTimeZoneOffsetInHours,
         fromDate.getUTCMinutes() + fromTime.getUTCMinutes());
     // Add time to to-date
-    toDate.setUTCHours(toDate.getUTCHours() + toTime.getUTCHours(), 
+    toDate.setUTCHours(toTime.getUTCHours() + currentTimeZoneOffsetInHours, 
         toDate.getUTCMinutes() + toTime.getUTCMinutes());
     if(fromDate > toDate || toDate >= today) {
         alert("Selección inválida. Intente de nuevo");
