@@ -11,6 +11,7 @@ var yPadding = 0.2  // vertical "padding" for the y axe
 // Variables
 var duration = 1000;        // Transition's duration
 var durationShort = 750;    // Shorter transition's duration
+var durationShortest = 250; // Shortest duration
 var init = false;           // Flag to initialize the graph
 var data;                   // Variable that holds the data
 var focus;                  // For the mouseover
@@ -242,7 +243,10 @@ function initGraph(){
         .attr("width", width)
         .attr("height", height)
         .style('opacity', 0)
-        .on("mouseover", function() { focus.style("display", null).transition().duration(durationShort).style('opacity', 1); })
+        .on("mouseover", function() { 
+            focus.style("display", null).transition()
+                .duration(durationShortest)
+                .style('opacity', 1); })
         .on("mouseout", function() { 
             focus.transition()
                 .duration(durationShort)

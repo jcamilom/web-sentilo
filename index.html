@@ -17,33 +17,34 @@
         </div>
         <div id="menurightcontent">            
             <form>
-                <div>
-                    <input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="today" id="titoday">
-                        <label for="titoday">Hoy<br></label>
-                    <input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="lastday" id="tilastday">
-                        <label for="tilastday">Últimas 24h<br></label>
-                    <input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="custom" id="ticustom">
-                        <label for="ticustom">Personalizado:</label>
-                </div>
-            </form>
-            <form>
-                <div id="dateDiv" class="divCustom">
-                    <label for="fromdate">Desde: </label>
-                        <input type="date" id="fromdate" name="fromDate" required disabled>
-                        <span class="validity"></span><br>
-                    <label for="fromtime">Hora: </label>
-                        <input type="time" id="fromtime" name="fromTime" value="00:00" required disabled>
-                        <span class="validity"></span>
-                    <label for="todate"><br>Hasta: </label>
-                        <input type="date" id="todate" name="toDate" required disabled>
-                        <span class="validity"></span><br>
-                    <label for="totime">Hora: </label>
-                        <input type="time" id="totime" name="toTime" value="00:00" required disabled>
-                        <span class="validity"></span>
-                </div>
-                <div id="submitDiv" class="divCustom">
-                    <button type="button" id="submitDate" onclick="validateDateForm()" disabled>Enviar consulta</button>
-                </div>
+                <fieldset>
+                    <legend>Fecha de datos</legend>
+                    <div>
+                        <input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="today" id="titoday">
+                            <label for="titoday">Hoy<br></label>
+                        <input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="lastday" id="tilastday">
+                            <label for="tilastday">Últimas 24h<br></label>
+                        <input type="radio" name="timeinterval" onclick="timeIntSelected(this);" value="custom" id="ticustom">
+                            <label for="ticustom">Personalizado:</label>
+                    </div>
+                    <div id="dateDiv" class="divCustom">
+                        <div class="input">
+                            <label for="fromdate">Desde: </label>
+                                <input type="date" id="fromdate" name="fromDate" required disabled>
+                                <span class="validity"></span>
+                                <input type="time" id="fromtime" name="fromTime" value="00:00" required disabled>
+                        </div>
+                        <div class="input">
+                            <label for="todate">Hasta: </label>
+                                <input type="date" id="todate" name="toDate" required disabled>
+                                <span class="validity"></span>
+                                <input type="time" id="totime" name="toTime" value="00:00" required disabled>
+                        </div>
+                    </div>
+                    <div id="submitDiv" class="divCustom">
+                        <button type="button" id="submitDate" onclick="validateDateForm()" disabled>Enviar consulta</button>
+                    </div>
+                </fieldset>
             </form>
         </div>
         <div id="clearingdiv"></div>
